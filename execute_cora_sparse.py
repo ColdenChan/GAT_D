@@ -55,7 +55,7 @@ val_mask = val_mask[np.newaxis]
 test_mask = test_mask[np.newaxis]
 
 if sparse:
-    biases = process.preprocess_adj_bias(adj)
+    biases = process.preprocess_adj_bias(adj)   #稀疏邻接矩阵+自循环，对角线和每个节点对应的一阶领域置为1
 else:
     adj = adj.todense()
     adj = adj[np.newaxis]
@@ -63,16 +63,16 @@ else:
 
 with tf.Graph().as_default():
     with tf.name_scope('input'):
-        ftr_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, ft_size))
+        ftr_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, ft_size))    #feature matrix
         if sparse:
             #bias_idx = tf.placeholder(tf.int64)
             #bias_val = tf.placeholder(tf.float32)
             #bias_shape = tf.placeholder(tf.int64)
-            bias_in = tf.sparse_placeholder(dtype=tf.float32)
+            bias_in = tf.sparse_placeholder(dtype=tf.float32)   #稀疏tensor占位符，需传入稀疏tensor的indices, data, shape   #mask matrix
         else:
             bias_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, nb_nodes))
-        lbl_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes, nb_classes))
-        msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes))
+        lbl_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes, nb_classes))   #class matrix
+        msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes))               #mask vector
         attn_drop = tf.placeholder(dtype=tf.float32, shape=())
         ffd_drop = tf.placeholder(dtype=tf.float32, shape=())
         is_train = tf.placeholder(dtype=tf.bool, shape=())

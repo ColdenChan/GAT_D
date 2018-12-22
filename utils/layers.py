@@ -41,23 +41,26 @@ def sp_attn_head(seq, out_sz, adj_mat, activation, nb_nodes, in_drop=0.0, coef_d
         if in_drop != 0.0:
             seq = tf.nn.dropout(seq, 1.0 - in_drop)
 
-        seq_fts = tf.layers.conv1d(seq, out_sz, 1, use_bias=False)
+        seq_fts = tf.layers.conv1d(seq, out_sz, 1, use_bias=False)  #shape: batch_size, nb_nodes, out_sz
 
         # simplest self-attention possible
-        f_1 = tf.layers.conv1d(seq_fts, 1, 1)
-        f_2 = tf.layers.conv1d(seq_fts, 1, 1)
+        f_1 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
+        f_2 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
         
-        f_1 = tf.reshape(f_1, (nb_nodes, 1))
-        f_2 = tf.reshape(f_2, (nb_nodes, 1))
+        f_1 = tf.reshape(f_1, (nb_nodes, 1))    #shape: batch_size*nb_nodes, 1
+        f_2 = tf.reshape(f_2, (nb_nodes, 1))    #shape: batch_size*nb_nodes, 1
+                                                #adj_mat:SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
+        #f_1的每一个元素分别乘以adj_mat的每一列     #adj_mat: shape= nb_nodes, nb_nodes
+        f_1 = adj_mat*f_1                       #SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
+        #f_2转置后变成行向量Tensor，稀疏Tensor和行向量Tensor相乘的结果是f_2的每一个元素分别乘以adj_mat的每一行
+                                                #f_1: shape = nb_nodes, nb_nodes
+        f_2 = adj_mat * tf.transpose(f_2, [1,0])#SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
 
-        f_1 = adj_mat*f_1
-        f_2 = adj_mat * tf.transpose(f_2, [1,0])
-
-        logits = tf.sparse_add(f_1, f_2)
+        logits = tf.sparse_add(f_1, f_2)        #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
         lrelu = tf.SparseTensor(indices=logits.indices, 
-                values=tf.nn.leaky_relu(logits.values), 
-                dense_shape=logits.dense_shape)
-        coefs = tf.sparse_softmax(lrelu)
+                values=tf.nn.leaky_relu(logits.values), #对value进行激活
+                dense_shape=logits.dense_shape) #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
+        coefs = tf.sparse_softmax(lrelu)        #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
 
         if coef_drop != 0.0:
             coefs = tf.SparseTensor(indices=coefs.indices,
@@ -69,12 +72,12 @@ def sp_attn_head(seq, out_sz, adj_mat, activation, nb_nodes, in_drop=0.0, coef_d
         # As tf.sparse_tensor_dense_matmul expects its arguments to have rank-2,
         # here we make an assumption that our input is of batch size 1, and reshape appropriately.
         # The method will fail in all other cases!
-        coefs = tf.sparse_reshape(coefs, [nb_nodes, nb_nodes])
-        seq_fts = tf.squeeze(seq_fts)
-        vals = tf.sparse_tensor_dense_matmul(coefs, seq_fts)
-        vals = tf.expand_dims(vals, axis=0)
+        coefs = tf.sparse_reshape(coefs, [nb_nodes, nb_nodes])  #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
+        seq_fts = tf.squeeze(seq_fts)   #该函数返回一个张量，这个张量是将原始input中所有维度为1的那些维都删掉的结果 shape：nb_nodes, out_sz
+        vals = tf.sparse_tensor_dense_matmul(coefs, seq_fts)    #shape：nb_nodes, out_sz
+        vals = tf.expand_dims(vals, axis=0)                     #shape：1, nb_nodes, out_sz
         vals.set_shape([1, nb_nodes, out_sz])
-        ret = tf.contrib.layers.bias_add(vals)
+        ret = tf.contrib.layers.bias_add(vals)                  #shape：1, nb_nodes, out_sz
 
         # residual connection
         if residual:
