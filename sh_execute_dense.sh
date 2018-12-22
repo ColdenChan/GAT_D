@@ -10,8 +10,7 @@
 #####################################################
 
 int=1
-end=${1}
-while(( $int<=$end ))
+while(( $int<=${1} ))
 do
 	time=`date "+%Y%m%d%H%M%S"`
 	python execute_dense.py --dataset ${2} --gpuid ${3} > ./log/cora/${time}.log 2>&1 &
