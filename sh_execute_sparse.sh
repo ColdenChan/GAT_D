@@ -12,7 +12,7 @@
 i=1
 end=$1
 echo $end
-while(( i<=$end ))
+while(( $i<=$end ))
 do
 	time=`date "+%Y%m%d%H%M%S"`
 	python execute_sparse.py --dataset ${2} --gpuid ${3} > ./log/cora/${time}.log 2>&1 &
