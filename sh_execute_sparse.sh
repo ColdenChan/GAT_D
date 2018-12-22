@@ -11,7 +11,6 @@
 
 i=1
 end=$1
-echo $end
 while(( $i<=$end ))
 do
 	time=`date "+%Y%m%d%H%M%S"`
