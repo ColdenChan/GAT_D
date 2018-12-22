@@ -84,13 +84,8 @@ test_mask = test_mask[np.newaxis]
 
 biases = process.adj_to_bias(adj, [nb_nodes], nhood=1)  #mask: 对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
 
-os.environ["CUDA_VISIBLE_DEVICES"] = opts.gpuid
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-config.allow_soft_placement = True
-config.log_device_placement = False
-with tf.Graph(config=config).as_default():
-#with tf.Graph().as_default():
+
+with tf.Graph().as_default():
     with tf.name_scope('input'):
         ftr_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, ft_size))    #feature matrix
         bias_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, nb_nodes))  #mask matrix
@@ -122,7 +117,13 @@ with tf.Graph(config=config).as_default():
     vacc_mx = 0.0
     curr_step = 0
 
-    with tf.Session() as sess:
+    os.environ["CUDA_VISIBLE_DEVICES"] = opts.gpuid
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    config.allow_soft_placement = True
+    config.log_device_placement = False
+    with tf.Session(config=config) as sess:
+    #with tf.Session() as sess:
         sess.run(init_op)
 
         train_loss_avg = 0
