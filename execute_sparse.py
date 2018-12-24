@@ -25,6 +25,7 @@ lr = 0.005  # learning rate
 l2_coef = 0.0005  # weight decay
 hid_units = [8] # numbers of hidden units per each attention head in each layer
 n_heads = [8, 1] # additional entry for the output layer
+n_dimension = 8
 residual = False
 nonlinearity = tf.nn.elu
 # model = GAT
@@ -78,12 +79,15 @@ with tf.Graph().as_default():
             bias_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, nb_nodes))
         lbl_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes, nb_classes))   #class matrix
         msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes))               #mask vector
+        W1 = tf.Variable(tf.zeros([hid_units[0], n_dimension]))
+        W2 = tf.Variable(tf.zeros([hid_units[0], n_dimension]))
+
         attn_drop = tf.placeholder(dtype=tf.float32, shape=())
         ffd_drop = tf.placeholder(dtype=tf.float32, shape=())
         is_train = tf.placeholder(dtype=tf.bool, shape=())
 
-    logits = model.inference(ftr_in, nb_classes, nb_nodes, is_train,
-                                attn_drop, ffd_drop,
+    logits = model.inference(ftr_in, nb_classes, nb_nodes, is_train, W1=W1, W2=W2,
+                                attn_drop=attn_drop, ffd_drop=ffd_drop,
                                 bias_mat=bias_in,
                                 hid_units=hid_units, n_heads=n_heads,
                                 residual=residual, activation=nonlinearity)
