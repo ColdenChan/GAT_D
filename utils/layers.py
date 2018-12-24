@@ -43,8 +43,8 @@ def sp_attn_head(seq, out_sz, adj_mat, activation, nb_nodes,W1, W2, in_drop=0.0,
 
         seq_fts = tf.layers.conv1d(seq, out_sz, 1, use_bias=False)  #shape: batch_size, nb_nodes, out_sz
 
-        f_1 = tf.matmul(seq_fts, W1)          #shape: batch_size, nb_nodes, n_dimension
-        f_2 = tf.matmul(seq_fts, W2)          #shape: batch_size, nb_nodes, n_dimension
+        # f_1 = tf.matmul(seq_fts, W1)          #shape: batch_size, nb_nodes, n_dimension
+        # f_2 = tf.matmul(seq_fts, W2)          #shape: batch_size, nb_nodes, n_dimension
         # simplest self-attention possible
         f_1 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
         f_2 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
