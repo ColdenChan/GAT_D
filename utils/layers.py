@@ -72,6 +72,7 @@ def sp_attn_head(seq, out_sz, adj_mat, adj_2, activation, nb_nodes,W1, W2, in_dr
         lrelu = tf.SparseTensor(indices=logits.indices, 
                 values=tf.nn.leaky_relu(logits.values), #对value进行激活
                 dense_shape=logits.dense_shape) #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
+        lrelu = tf.sparse_add(lrelu, adj_2)
         coefs = tf.sparse_softmax(lrelu)        #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
 
         if coef_drop != 0.0:
