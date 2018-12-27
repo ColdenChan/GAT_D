@@ -11,11 +11,12 @@ def attn_head(seq, out_sz, bias_mat, activation, in_drop=0.0, coef_drop=0.0, res
         seq_fts = tf.layers.conv1d(seq, out_sz, 1, use_bias=False)  #shape: batch_size, nb_nodes, out_sz
 
         # simplest self-attention possible
-        f_1 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
-        f_2 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
-        logits = f_1 + tf.transpose(f_2, [0, 2, 1]) #shape: batch_size, nb_nodes, nb_nodes
-        coefs = tf.nn.softmax(tf.nn.leaky_relu(logits) + bias_mat)  #attention coefficients
+        # f_1 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
+        # f_2 = tf.layers.conv1d(seq_fts, 1, 1)   #shape: batch_size, nb_nodes, 1
+        # logits = f_1 + tf.transpose(f_2, [0, 2, 1]) #shape: batch_size, nb_nodes, nb_nodes
+        # coefs = tf.nn.softmax(tf.nn.leaky_relu(logits) + bias_mat)  #attention coefficients
                                                                     # shape: batch_size, nb_nodes, nb_nodes
+        coefs = tf.nn.softmax(bias_mat)
         if coef_drop != 0.0:
             coefs = tf.nn.dropout(coefs, 1.0 - coef_drop)
         if in_drop != 0.0:
