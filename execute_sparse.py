@@ -48,13 +48,7 @@ sparse = True
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = process.load_data(dataset)
 features, spars = process.preprocess_features(features)
 
-adj_2 = adj*adj
-adj_2[adj_2>1]=1
-adj_2 = adj_2 - sp.csr_matrix(np.eye(adj.shape[0]))
-adj_2[adj_2<0]=0
-adj_2[adj_2>0]=-1
-adj_2[adj_2!=-1]=-1e9
-adj_2 = adj_2 + (-1e9)*sp.csr_matrix(np.eye(adj.shape[0]))
+
 
 nb_nodes = features.shape[0]
 ft_size = features.shape[1]
@@ -70,6 +64,7 @@ test_mask = test_mask[np.newaxis]
 
 if sparse:
     biases = process.preprocess_adj_bias(adj)   #稀疏邻接矩阵+自循环，对角线和每个节点对应的一阶领域置为1
+    adj_2 = process.preprocess_adj_2_bias(adj)
 else:
     adj = adj.todense()
     adj = adj[np.newaxis]
@@ -83,6 +78,7 @@ with tf.Graph().as_default():
             #bias_val = tf.placeholder(tf.float32)
             #bias_shape = tf.placeholder(tf.int64)
             bias_in = tf.sparse_placeholder(dtype=tf.float32)   #稀疏tensor占位符，需传入稀疏tensor的indices, data, shape   #mask matrix
+            adj_2_in = tf.sparse_placeholder(dtype=tf.float32)
         else:
             bias_in = tf.placeholder(dtype=tf.float32, shape=(batch_size, nb_nodes, nb_nodes))
         lbl_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes, nb_classes))   #class matrix
@@ -96,7 +92,7 @@ with tf.Graph().as_default():
 
     logits = model.inference(ftr_in, nb_classes, nb_nodes, is_train, W1=W1, W2=W2,
                                 attn_drop=attn_drop, ffd_drop=ffd_drop,
-                                bias_mat=bias_in, adj_2=adj_2,
+                                bias_mat=bias_in, adj_2=adj_2_in,
                                 hid_units=hid_units, n_heads=n_heads,
                                 residual=residual, activation=nonlinearity)
     log_resh = tf.reshape(logits, [-1, nb_classes])
@@ -143,6 +139,7 @@ with tf.Graph().as_default():
                     feed_dict={
                         ftr_in: features[tr_step*batch_size:(tr_step+1)*batch_size],
                         bias_in: bbias,
+                        adj_2_in: adj_2,
                         lbl_in: y_train[tr_step*batch_size:(tr_step+1)*batch_size],
                         msk_in: train_mask[tr_step*batch_size:(tr_step+1)*batch_size],
                         is_train: True,
@@ -163,6 +160,7 @@ with tf.Graph().as_default():
                     feed_dict={
                         ftr_in: features[vl_step*batch_size:(vl_step+1)*batch_size],
                         bias_in: bbias,
+                        adj_2_in: adj_2,
                         lbl_in: y_val[vl_step*batch_size:(vl_step+1)*batch_size],
                         msk_in: val_mask[vl_step*batch_size:(vl_step+1)*batch_size],
                         is_train: False,
@@ -211,6 +209,7 @@ with tf.Graph().as_default():
                 feed_dict={
                     ftr_in: features[ts_step*batch_size:(ts_step+1)*batch_size],
                     bias_in: bbias,
+                    adj_2_in: adj_2,
                     lbl_in: y_test[ts_step*batch_size:(ts_step+1)*batch_size],
                     msk_in: test_mask[ts_step*batch_size:(ts_step+1)*batch_size],
                     is_train: False,

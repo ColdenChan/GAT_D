@@ -190,3 +190,16 @@ def preprocess_adj_bias(adj):
     indices = np.vstack((adj.col, adj.row)).transpose()  # This is where I made a mistake, I used (adj.row, adj.col) instead
     # return tf.SparseTensor(indices=indices, values=adj.data, dense_shape=adj.shape)
     return indices, adj.data, adj.shape
+
+def preprocess_adj_2_bias(adj):
+    num_nodes = adj.shape[0]
+    adj_2 = adj * adj + sp.eye(num_nodes)
+    adj_2[adj_2 > 0.0] = 1.0
+    adj_2[adj_2 < 1.0] = -1e9
+    if not sp.isspmatrix_coo(adj_2):
+        adj_2 = adj_2.tocoo()
+        adj_2 = adj_2.astype(np.float32)
+    indices = np.vstack((adj_2.col, adj_2.row)).transpose()  # This is where I made a mistake, I used (adj.row, adj.col) instead
+    # return tf.SparseTensor(indices=indices, values=adj.data, dense_shape=adj.shape)
+    return indices, adj_2.data, adj_2.shape
+
