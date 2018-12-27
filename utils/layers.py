@@ -63,17 +63,18 @@ def sp_attn_head(seq, out_sz, adj_mat, adj_2, activation, nb_nodes,W1, W2, in_dr
         #adj_mat = adj_mat*W
                                                 #adj_mat:SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
         #f_1的每一个元素分别乘以adj_mat的每一列     #adj_mat: shape= nb_nodes, nb_nodes
-        f_1 = adj_mat*f_1                       #SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
+        #f_1 = adj_mat*f_1                       #SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
+        f_1 = adj_2*f_1
         #f_2转置后变成行向量Tensor，稀疏Tensor和行向量Tensor相乘的结果是f_2的每一个元素分别乘以adj_mat的每一行
                                                 #f_1: shape = nb_nodes, nb_nodes
-        f_2 = adj_mat * tf.transpose(f_2, [1,0])#SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
-
+        #f_2 = adj_mat * tf.transpose(f_2, [1,0])#SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
+        f_2 = adj_2 * tf.transpose(f_2, [1, 0])
         logits = tf.sparse_add(f_1, f_2)        #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
         lrelu = tf.SparseTensor(indices=logits.indices, 
                 values=tf.nn.leaky_relu(logits.values), #对value进行激活
                 dense_shape=logits.dense_shape) #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
 
-        lrelu = tf.sparse_add(lrelu, adj_2)
+        #lrelu = tf.sparse_add(lrelu, adj_2)
         coefs = tf.sparse_softmax(lrelu)        #SparseTensor(indices=Tensor(shape(?, 2)), values=Tensor(shape(?,)), dense_shape=Tensor(shape(2,)))
 
         if coef_drop != 0.0:

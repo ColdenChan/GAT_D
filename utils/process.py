@@ -195,7 +195,7 @@ def preprocess_adj_2_bias(adj):
     num_nodes = adj.shape[0]
     adj_2 = adj * adj + sp.eye(num_nodes)
     adj_2[adj_2 > 0.0] = 1.0
-    adj_2[adj_2 < 1.0] = -1e9
+    #adj_2[adj_2 < 1.0] = -1e9
     if not sp.isspmatrix_coo(adj_2):
         adj_2 = adj_2.tocoo()
         adj_2 = adj_2.astype(np.float32)
