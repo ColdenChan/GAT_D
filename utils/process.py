@@ -19,14 +19,17 @@ def adj_to_bias(adj, sizes, nhood=1):
         mt[g] = np.eye(adj.shape[1])
         for _ in range(nhood):
             #mt[g] = np.matmul(mt[g], (adj[g] + np.eye(adj.shape[1])))      #单位矩阵*（邻接矩阵+单位矩阵）,所以该步有点多余,改为下句
-            mt[g] = np.matmul(adj[g], adj[g]) + adj[g] + np.eye(adj.shape[1])   #邻接矩阵+单位阵 （加了个自循环）
+            mt[g] = adj[g] + np.eye(adj.shape[1])   #邻接矩阵+单位阵 （加了个自循环）
         #经过前面验证，传进来的邻接矩阵是只有0和1的，再加上一个单位阵
         # for i in range(sizes[g]):
         #     for j in range(sizes[g]):
         #         if mt[g][i][j] > 0.0:
         #             mt[g][i][j] = 1.0
         mt[g][mt[g]>1.0] = 1.0
-    return -1e9 * (1.0 - mt)    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
+    adj2 = np.matmul(adj[g], adj[g])
+    adj2 = adj2 - -np.diag(adj2.diagonal())
+    adj2[adj2>0] = -1
+    return -1e9 * (1.0 - mt)+adj2    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
 
 
 ###############################################
