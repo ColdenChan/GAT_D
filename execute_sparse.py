@@ -48,8 +48,12 @@ sparse = True
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = process.load_data(dataset)
 features, spars = process.preprocess_features(features)
 
-adj_2 = adj*adj - sp.csr_matrix(np.eye(adj.shape[0]))
+adj_2 = adj*adj
+adj_2[adj_2>1]=1
+adj_2 = adj_2 - sp.csr_matrix(np.eye(adj.shape[0]))
+adj_2[adj_2<0]=0
 adj_2[adj_2>0]=0.8
+adj_2 = adj_2 + sp.csr_matrix(np.eye(adj.shape[0]))
 
 nb_nodes = features.shape[0]
 ft_size = features.shape[1]
