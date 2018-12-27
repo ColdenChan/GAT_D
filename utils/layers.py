@@ -36,7 +36,7 @@ def attn_head(seq, out_sz, bias_mat, activation, in_drop=0.0, coef_drop=0.0, res
 
 # Experimental sparse attention head (for running on datasets such as Pubmed)
 # N.B. Because of limitations of current TF implementation, will work _only_ if batch_size = 1!
-def sp_attn_head(seq, out_sz, adj_mat, activation, nb_nodes,W1, W2, in_drop=0.0, coef_drop=0.0, residual=False):
+def sp_attn_head(seq, out_sz, adj_mat, adj_2, activation, nb_nodes,W1, W2, in_drop=0.0, coef_drop=0.0, residual=False):
     with tf.name_scope('sp_attn'):
         if in_drop != 0.0:
             seq = tf.nn.dropout(seq, 1.0 - in_drop)
@@ -59,8 +59,8 @@ def sp_attn_head(seq, out_sz, adj_mat, activation, nb_nodes,W1, W2, in_drop=0.0,
         # f_1 = tf.expand_dims(f_1, 1)            #shape: batch_size*nb_nodes, 1, n_dimension
         # f_2 = tf.expand_dims(f_2, 0)            #shape: 1, batch_size*nb_nodes, n_dimension
 
-        W = tf.Variable(tf.random_normal([nb_nodes,nb_nodes], stddev=0.35))
-        adj_mat = adj_mat*W
+        #W = tf.Variable(tf.random_normal([nb_nodes,nb_nodes], stddev=0.35))
+        #adj_mat = adj_mat*W
                                                 #adj_mat:SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))
         #f_1的每一个元素分别乘以adj_mat的每一列     #adj_mat: shape= nb_nodes, nb_nodes
         f_1 = adj_mat*f_1                       #SparseTensor(indices=Tensor(shape(非零元素个数, 2)), values=Tensor(shape(非零元素个数,)), dense_shape=Tensor(shape(2,)))

@@ -48,6 +48,9 @@ sparse = True
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = process.load_data(dataset)
 features, spars = process.preprocess_features(features)
 
+adj_2 = adj*adj - sp.csr_matrix(np.eye(adj.shape[0]))
+adj_2[adj_2>0]=0.8
+
 nb_nodes = features.shape[0]
 ft_size = features.shape[1]
 nb_classes = y_train.shape[1]
@@ -88,7 +91,7 @@ with tf.Graph().as_default():
 
     logits = model.inference(ftr_in, nb_classes, nb_nodes, is_train, W1=W1, W2=W2,
                                 attn_drop=attn_drop, ffd_drop=ffd_drop,
-                                bias_mat=bias_in,
+                                bias_mat=bias_in, adj_2=adj_2,
                                 hid_units=hid_units, n_heads=n_heads,
                                 residual=residual, activation=nonlinearity)
     log_resh = tf.reshape(logits, [-1, nb_classes])
