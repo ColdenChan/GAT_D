@@ -20,10 +20,10 @@ do
 	do
 		time=`date "+%Y%m%d%H%M%S"`
 		python execute_dense.py --runid $j --dataset ${3} --gpuid ${4} > ./log/cora/${time}.log 2>&1 &
-		sleep 1 
+		sleep 5 
 		let j++
 	done
-	sleep 240
+	sleep 600
 	let i++
 done
 
