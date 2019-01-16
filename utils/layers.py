@@ -21,7 +21,7 @@ def attn_head(seq, out_sz, bias_mat, activation, in_drop=0.0, coef_drop=0.0, res
         #coefs = tf.nn.softmax(bias_mat)
 
         ################## 3 self-attention 全1
-        logits = tf.constant(tf.ones([seq_fts.get_shape().as_list()[0], seq_fts.get_shape().as_list()[1], seq_fts.get_shape().as_list()[1]], tf.int32))
+        logits = tf.ones([seq_fts.get_shape().as_list()[0], seq_fts.get_shape().as_list()[1], seq_fts.get_shape().as_list()[1]], tf.int32)
         coefs = tf.nn.softmax(logits + bias_mat)
 
         if coef_drop != 0.0:
