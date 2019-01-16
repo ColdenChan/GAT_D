@@ -7,11 +7,12 @@ from utils import process
 import argparse
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--runid', default='1', type=str, help='the id of current running program')
 parser.add_argument('--dataset', default='cora', type=str, help='choose a dataset: cora, citeseer, pubmed')
 parser.add_argument('--gpuid', default='0' ,type=str, help='choose a gpu to excute program:0, 1, 2, 3')
 opts = parser.parse_args()
 
-checkpt_file = 'pre_trained/'+ opts.dataset +'/mod_'+ opts.dataset +'.ckpt'
+checkpt_file = 'pre_trained/'+ opts.dataset + opts.gpuid +'/mod_'+ opts.dataset + opts.runid +'.ckpt'
 
 dataset = opts.dataset    #cora, citeseer, pubmed
 
