@@ -18,7 +18,12 @@ def attn_head(seq, out_sz, bias_mat, activation, in_drop=0.0, coef_drop=0.0, res
         # coefs = tf.nn.softmax(tf.nn.leaky_relu(logits) + bias_mat)  #attention coefficients
                                                                    # shape: batch_size, nb_nodes, nb_nodes
         ################## 2 去掉self-attention
-        coefs = tf.nn.softmax(bias_mat)
+        #coefs = tf.nn.softmax(bias_mat)
+
+        ################## 3 self-attention 全1
+        logits = tf.constant(tf.ones([seq_fts.get_shape().as_list()[0], seq_fts.get_shape().as_list()[1], seq_fts.get_shape().as_list()[1]], tf.int32))
+        coefs = tf.nn.softmax(logits + bias_mat)
+
         if coef_drop != 0.0:
             coefs = tf.nn.dropout(coefs, 1.0 - coef_drop)
         if in_drop != 0.0:
