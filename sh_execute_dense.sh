@@ -23,7 +23,7 @@ do
 		sleep 1 
 		let j++
 	done
-	sleep 300
+	sleep 600
 	let i++
 done
 
