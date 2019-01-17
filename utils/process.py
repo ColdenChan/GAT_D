@@ -12,7 +12,7 @@ import sys
  Expected shape: [graph, nodes, nodes]
 """
 #adj_to_bias(adj, [nb_nodes], nhood=1), nb_nodes:节点个数
-def adj_to_bias(adj, sizes, nhood=1):
+def adj_to_bias(adj, sizes, nhood=1, t=0):
     nb_graphs = adj.shape[0]    #第一维是新增加的，维数为1 np.newaixs
     mt = np.empty(adj.shape)
     for g in range(nb_graphs):
@@ -31,7 +31,7 @@ def adj_to_bias(adj, sizes, nhood=1):
     ################## 4 mask 1阶+2阶
     adj2 = np.array(np.matmul(adj[g], adj[g]))
     adj2 = adj2 - np.diag(adj2.diagonal())
-    adj2[adj2>0] = 0.2
+    adj2[adj2>0] = t
     adj2 = adj2[np.newaxis]
     return -1e9 * (1.0 - mt) + adj2    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
 

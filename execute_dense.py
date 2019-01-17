@@ -8,6 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--runid', default='1', type=str, help='the id of current running program')
+parser.add_argument('--t', default=0, type=int, help='the 2-nd adj mask element')
 parser.add_argument('--dataset', default='cora', type=str, help='choose a dataset: cora, citeseer, pubmed')
 parser.add_argument('--gpuid', default='0' ,type=str, help='choose a gpu to excute program:0, 1, 2, 3')
 opts = parser.parse_args()
@@ -83,7 +84,7 @@ train_mask = train_mask[np.newaxis]
 val_mask = val_mask[np.newaxis]
 test_mask = test_mask[np.newaxis]
 
-biases = process.adj_to_bias(adj, [nb_nodes], nhood=1)  #mask: 对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
+biases = process.adj_to_bias(adj, [nb_nodes], nhood=1, t=opts.t)  #mask: 对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
 
 
 with tf.Graph().as_default():
