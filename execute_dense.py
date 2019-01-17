@@ -8,7 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--runid', default='1', type=str, help='the id of current running program')
-parser.add_argument('--t', default=0, type=int, help='the 2-nd adj mask element')
+parser.add_argument('--t', default=0, type=float, help='the 2-nd adj mask element')
 parser.add_argument('--dataset', default='cora', type=str, help='choose a dataset: cora, citeseer, pubmed')
 parser.add_argument('--gpuid', default='0' ,type=str, help='choose a gpu to excute program:0, 1, 2, 3')
 opts = parser.parse_args()
