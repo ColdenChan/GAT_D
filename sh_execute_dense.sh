@@ -17,9 +17,10 @@ end_j=$2	#run times
 end_k=$3	#program nums every run
 while(( $i<=$end_1 ))
 do
+	j=1
 	while (( $j<=$end_2 ))
 	do
-		j=1
+		k=1
 		while(( $k<=$end_3 ))
 		do
 			time=`date "+%Y%m%d%H%M%S"`
