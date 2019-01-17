@@ -9,7 +9,7 @@
 # Brief:
 #####################################################
 
-i=0
+i=1
 j=1
 k=1
 end_i=$1	#2-nd mask element
@@ -24,7 +24,7 @@ do
 		while(( $k<=$end_k ))
 		do
 			time=`date "+%Y%m%d%H%M%S"`
-			python execute_dense.py --runid $k --t $i --dataset ${4} --gpuid ${5} > ./log/cora/${time}.log 2>&1 &
+			python execute_dense.py --runid $k --t $-i --dataset ${4} --gpuid ${5} > ./log/cora/${time}.log 2>&1 &
 			sleep 5 
 			let k++
 		done
