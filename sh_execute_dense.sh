@@ -9,22 +9,22 @@
 # Brief:
 #####################################################
 
-i=1
+i=0
 j=1
 k=1
 end_i=$1	#2-nd mask element
 end_j=$2	#run times
 end_k=$3	#program nums every run
-while(( $i<=$end_1 ))
+while(( $i<=$end_i ))
 do
 	j=1
-	while (( $j<=$end_2 ))
+	while (( $j<=$end_j ))
 	do
 		k=1
-		while(( $k<=$end_3 ))
+		while(( $k<=$end_k ))
 		do
 			time=`date "+%Y%m%d%H%M%S"`
-			python execute_dense.py --runid $k --t $i-1 --dataset ${4} --gpuid ${5} > ./log/cora/${time}.log 2>&1 &
+			python execute_dense.py --runid $k --t $i --dataset ${4} --gpuid ${5} > ./log/cora/${time}.log 2>&1 &
 			sleep 5 
 			let k++
 		done
