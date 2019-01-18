@@ -17,7 +17,8 @@ end_j=$2	#run times
 end_k=$3	#program nums every run
 while(( $i<=$end_i ))
 do
-	echo -$i
+	y=$((10*i))
+	echo -$y
 	j=1
 	while (( $j<=$end_j ))
 	do
@@ -25,11 +26,11 @@ do
 		while(( $k<=$end_k ))
 		do
 			time=`date "+%Y%m%d%H%M%S"`
-			python execute_dense.py --runid $k --t -$i --dataset ${4} --gpuid ${5} > ./log/cora/${time}.log 2>&1 &
+			python execute_dense.py --runid $k --t -$y --dataset ${4} --gpuid ${5} > ./log/cora/${time}.log 2>&1 &
 			sleep 5 
 			let k++
 		done
-		sleep 480
+		sleep 400
 		let j++
 	done
 	sleep 30
