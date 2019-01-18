@@ -17,7 +17,7 @@ end_j=$2	#run times
 end_k=$3	#program nums every run
 while(( $i<=$end_i ))
 do
-	echo -0\.$i
+	echo -$i
 	j=1
 	while (( $j<=$end_j ))
 	do
