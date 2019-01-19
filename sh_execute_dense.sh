@@ -9,7 +9,7 @@
 # Brief:
 #####################################################
 
-i=4
+i=1
 j=1
 k=1
 end_i=$1	#2-nd mask element
@@ -29,7 +29,7 @@ do
 			sleep 5
 			let k++
 		done
-		sleep 480
+		sleep 400
 		let j++
 	done
 	sleep 30
