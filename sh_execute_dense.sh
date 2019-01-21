@@ -29,7 +29,7 @@ do
 			sleep 5
 			let k++
 		done
-		sleep 400
+		sleep 540
 		let j++
 	done
 	sleep 30
