@@ -102,18 +102,30 @@ def preprocess_features(features):
     return features.todense(), sparse_to_tuple(features)
 features, spars = preprocess_features(features)
 
-def adj_to_bias(adj, sizes, nhood=1):
-    nb_graphs = adj.shape[0]
+def adj_to_bias(adj, t, sizes, nhood=1):
+    nb_graphs = adj.shape[0]  # 第一维是新增加的，维数为1 np.newaixs
     mt = np.empty(adj.shape)
     for g in range(nb_graphs):
         mt[g] = np.eye(adj.shape[1])
         for _ in range(nhood):
-            mt[g] = np.matmul(mt[g], (adj[g] + np.eye(adj.shape[1])))
-        for i in range(sizes[g]):
-            for j in range(sizes[g]):
-                if mt[g][i][j] > 0.0:
-                    mt[g][i][j] = 1.0
-    return -1e9 * (1.0 - mt)
+            # mt[g] = np.matmul(mt[g], (adj[g] + np.eye(adj.shape[1])))      #单位矩阵*（邻接矩阵+单位矩阵）,所以该步有点多余,改为下句
+            mt[g] = adj[g] + np.eye(adj.shape[1])  # 邻接矩阵+单位阵 （加了个自循环）
+        # 经过前面验证，传进来的邻接矩阵是只有0和1的，再加上一个单位阵
+        # for i in range(sizes[g]):
+        #     for j in range(sizes[g]):
+        #         if mt[g][i][j] > 0.0:
+        #             mt[g][i][j] = 1.0
+        mt[g][mt[g] > 1.0] = 1.0
+
+    adj2 = np.array(np.matmul(adj[g], adj[g]),dtype=np.float)
+    adj2 = adj2 - np.diag(adj2.diagonal())
+    adj2[adj2 > 0] = t
+    adj2 = adj2[np.newaxis]
+    adj12 = mt + adj2
+    adj12[adj12 == 0] = -1e9
+    adj12[adj12 == 1] = 0
+    adj12[adj12 == 1 + t] = 0
+    return adj12
 
 nb_nodes = features.shape[0]    #node个数
 ft_size = features.shape[1]     #feature个数
@@ -130,7 +142,7 @@ train_mask = train_mask[np.newaxis]
 val_mask = val_mask[np.newaxis]
 test_mask = test_mask[np.newaxis]
 
-biases = adj_to_bias(adj, [nb_nodes], nhood=1)
+biases = adj_to_bias(adj, -0.1, [nb_nodes], nhood=1)
 
 conv1d = tf.layers.conv1d
 #layers.attn_head(inputs, bias_mat=bias_mat, out_sz=hid_units[0], activation=activation, in_drop=ffd_drop, coef_drop=attn_drop, residual=False)

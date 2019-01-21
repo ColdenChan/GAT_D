@@ -29,14 +29,22 @@ def adj_to_bias(adj, sizes, nhood=1, t=0):
         mt[g][mt[g]>1.0] = 1.0
     #return -1e9 * (1.0 - mt)
 
-    ################## 4 mask 1阶+2阶
+    ################## 4 mask 1阶+2阶(问题代码)
+    # adj2 = np.array(np.matmul(adj[g], adj[g]))
+    # adj2 = adj2 - np.diag(adj2.diagonal())
+    # adj2[adj2>0] = t
+    # adj2 = adj2[np.newaxis]
+    # return -1e9 * (1.0 - mt) + adj2    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
+
     adj2 = np.array(np.matmul(adj[g], adj[g]))
     adj2 = adj2 - np.diag(adj2.diagonal())
     adj2[adj2>0] = t
     adj2 = adj2[np.newaxis]
-    adj = 1.0 - mt + adj2
-    adj[adj==1] = -1e9
-    return adj    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
+    adj12 = mt + adj2
+    adj12[adj12==0] = -1e9
+    adj12[adj12==1] = 0
+    adj12[adj12==1+t] = 0
+    return adj12
 
 
 ###############################################
