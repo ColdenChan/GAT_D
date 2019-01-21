@@ -26,10 +26,10 @@ do
 		do
 			time=`date "+%Y%m%d%H%M%S"`
 			python execute_dense.py --runid $k --t -0\.$i --dataset ${4} --gpuid ${5} > ./log/${4}/${time}.log 2>&1 &
-			sleep 5
+			sleep 3
 			let k++
 		done
-		sleep 700
+		sleep 900
 		let j++
 	done
 	sleep 30
