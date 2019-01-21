@@ -34,7 +34,9 @@ def adj_to_bias(adj, sizes, nhood=1, t=0):
     adj2 = adj2 - np.diag(adj2.diagonal())
     adj2[adj2>0] = t
     adj2 = adj2[np.newaxis]
-    return -1e9 * (1.0 - mt) + adj2    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
+    adj = 1.0 - mt + adj2
+    adj[adj==1] = -1e9
+    return adj    #将对角线和每个节点对应的一阶领域置为0，其余的置为-1e9
 
 
 ###############################################
