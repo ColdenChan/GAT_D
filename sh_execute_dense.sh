@@ -17,6 +17,9 @@ end_j=$2	#run times
 end_k=$3	#program nums every run
 while(( $i<=$end_i ))
 do
+	if [ ! -d "./log/${4}/${i}" ]; then
+		mkdir ./log/${4}/${i}
+	fi
 	echo -0\.$i
 	j=1
 	while(( $j<=$end_j ))
@@ -25,10 +28,9 @@ do
 		while(( $k<=$end_k ))
 		do
 			time=`date "+%Y%m%d%H%M%S"`
-			if [ -d "./log/${4}/${i}" ]; then
-				rm -rf ./log/${4}/${i}
-			fi
-			mkdir ./log/${4}/${i}
+			# if [ -d "./log/${4}/${i}" ]; then
+				# rm -rf ./log/${4}/${i}
+			# fi
 			python execute_dense.py --runid $k --t -0\.$i --dataset ${4} --gpuid ${5} > ./log/${4}/${i}/${time}.log 2>&1 &
 			sleep 3
 			let k++
