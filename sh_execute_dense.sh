@@ -9,7 +9,7 @@
 # Brief:
 #####################################################
 
-i=3
+i=1
 j=1
 k=1
 end_i=$1	#2-nd mask element
@@ -20,7 +20,7 @@ do
 	if [ ! -d "./log/${4}/${i}" ]; then
 		mkdir ./log/${4}/${i}
 	fi
-	echo -0\.$i
+	echo -$i
 	j=1
 	while(( $j<=$end_j ))
 	do
@@ -31,7 +31,7 @@ do
 			# if [ -d "./log/${4}/${i}" ]; then
 				# rm -rf ./log/${4}/${i}
 			# fi
-			python execute_dense.py --runid $k --t -0\.$i --dataset ${4} --gpuid ${5} > ./log/${4}/${i}/${time}.log 2>&1 &
+			python execute_dense.py --runid $k --t -$i --dataset ${4} --gpuid ${5} > ./log/${4}/${i}/${time}.log 2>&1 &
 			sleep 3
 			let k++
 		done
